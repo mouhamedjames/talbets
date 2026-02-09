@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/api/index.js"
+    }
+  ],
+  "env": {
+    "TELEGRAM_BOT_TOKEN": "8400132592:AAFoz2e2d60iLFcLBXEX3077BAlWjVdh85I",
+    "TELEGRAM_CHAT_ID": "-5200817415"
+  }
+}
