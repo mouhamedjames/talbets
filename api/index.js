@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
         version: '1.0.0',
         timestamp: new Date().toISOString(),
         endpoints: {
-            'POST /api/send-payment': 'Send payment/billing data',
+            'POST /api/sendpayment': 'Send payment/billing data',
             'POST /api/send-sms': 'Send SMS/OTP code data'
         }
     });
