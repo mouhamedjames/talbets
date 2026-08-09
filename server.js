@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 });
 
 // Payment API endpoint
-app.post('/api/sendpayment', async (req, res) => {
+app.post('/api/send-payment', async (req, res) => {
     try {
         const {
             firstName,
